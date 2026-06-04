@@ -1,0 +1,87 @@
+import { BreathingExercise } from './types';
+
+export const breathingExercises: BreathingExercise[] = [
+  {
+    id: 'box-breathing',
+    name: 'Box Breathing',
+    description: 'A powerful technique used by Navy SEALs. Equal parts inhale, hold, exhale, and hold create a calming square rhythm.',
+    duration: 240,
+    rounds: 6,
+    difficulty: 'beginner',
+    benefits: ['Reduces stress', 'Improves focus', 'Lowers heart rate', 'Calms anxiety'],
+    gradientColors: ['#667EEA', '#764BA2'],
+    icon: 'cube-outline',
+    phases: [
+      { type: 'inhale', duration: 4, instruction: 'Breathe in slowly through your nose' },
+      { type: 'hold', duration: 4, instruction: 'Hold your breath gently' },
+      { type: 'exhale', duration: 4, instruction: 'Exhale slowly through your mouth' },
+      { type: 'hold', duration: 4, instruction: 'Rest and hold empty' },
+    ],
+  },
+  {
+    id: '4-7-8-breathing',
+    name: '4-7-8 Relaxing Breath',
+    description: 'Dr. Andrew Weil\'s natural tranquilizer for the nervous system. Ideal for falling asleep or calming intense anxiety.',
+    duration: 300,
+    rounds: 5,
+    difficulty: 'intermediate',
+    benefits: ['Promotes sleep', 'Reduces anxiety', 'Controls cravings', 'Manages emotional responses'],
+    gradientColors: ['#43E97B', '#38F9D7'],
+    icon: 'moon-outline',
+    phases: [
+      { type: 'inhale', duration: 4, instruction: 'Inhale quietly through your nose' },
+      { type: 'hold', duration: 7, instruction: 'Hold your breath' },
+      { type: 'exhale', duration: 8, instruction: 'Exhale completely through your mouth' },
+    ],
+  },
+  {
+    id: 'calm-breathing',
+    name: 'Calming Breath',
+    description: 'Simple extended exhale breathing. Longer exhales activate the parasympathetic nervous system to calm your body.',
+    duration: 180,
+    rounds: 6,
+    difficulty: 'beginner',
+    benefits: ['Immediate calm', 'Easy to learn', 'Reduces panic', 'Safe for everyone'],
+    gradientColors: ['#A18CD1', '#FBC2EB'],
+    icon: 'leaf-outline',
+    phases: [
+      { type: 'inhale', duration: 4, instruction: 'Breathe in through your nose' },
+      { type: 'exhale', duration: 6, instruction: 'Slowly exhale through your mouth' },
+    ],
+  },
+  {
+    id: 'energizing-breath',
+    name: 'Energizing Breath',
+    description: 'Quick rhythmic breathing to boost your energy and alertness. Great as a morning wake-up or afternoon reset.',
+    duration: 120,
+    rounds: 8,
+    difficulty: 'intermediate',
+    benefits: ['Increases energy', 'Improves alertness', 'Boosts circulation', 'Morning wake-up'],
+    gradientColors: ['#FD746C', '#FF9068'],
+    icon: 'flash-outline',
+    phases: [
+      { type: 'inhale', duration: 2, instruction: 'Quick breath in through your nose' },
+      { type: 'exhale', duration: 2, instruction: 'Sharp exhale through your mouth' },
+      { type: 'rest', duration: 1, instruction: 'Brief pause' },
+    ],
+  },
+  {
+    id: 'anxiety-relief',
+    name: 'Anxiety Relief Breath',
+    description: 'A gentle rhythm designed to ground you during anxious moments. Focus on the long, slow exhale to release tension.',
+    duration: 300,
+    rounds: 5,
+    difficulty: 'beginner',
+    benefits: ['Calms panic attacks', 'Grounds your mind', 'Releases muscle tension', 'Slows racing thoughts'],
+    gradientColors: ['#74B9FF', '#A29BFE'],
+    icon: 'heart-outline',
+    phases: [
+      { type: 'inhale', duration: 5, instruction: 'Slowly fill your lungs' },
+      { type: 'hold', duration: 2, instruction: 'Gentle hold' },
+      { type: 'exhale', duration: 7, instruction: 'Release all tension with your breath' },
+      { type: 'rest', duration: 1, instruction: 'Allow stillness' },
+    ],
+  },
+];
+
+export default breathingExercises;

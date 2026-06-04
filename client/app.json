@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "Neshama",
+    "slug": "Neshama",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./app/assets/neshama-icon-1024.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "package": "neshama.app",
+      "permissions": [
+        "NOTIFICATIONS",
+        "SCHEDULE_EXACT_ALARM"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#7C5CFC",
+          "defaultChannel": "default"
+        }
+      ],
+      "expo-font"
+    ],
+    "owner": "shoam333",
+    "extra": {
+      "eas": {
+        "projectId": "4ec76c39-f1f2-47a1-9540-7b8d52f59e2b"
+      }
+    }
+  }
+}
