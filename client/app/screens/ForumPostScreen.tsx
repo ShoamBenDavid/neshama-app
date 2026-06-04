@@ -85,16 +85,23 @@ export default function ForumPostScreen() {
   const rowDirection = isRTL ? 'row-reverse' : 'row';
 
   return (
-    <Screen scrollable={false} padded={false}>
+    <Screen
+      scrollable={false}
+      padded={false}
+      contentContainerStyle={styles.screenContent}
+    >
       <Header title={t('forum.post')} showBack />
 
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 30 : 10}
       >
         <FlatList
           data={selectedPost.comments || []}
           keyExtractor={(_, index) => `comment-${index}`}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
           ListHeaderComponent={
             <View style={styles.postContent}>
               <View
@@ -193,7 +200,7 @@ export default function ForumPostScreen() {
         <View
           style={[
             styles.commentInput,
-            { paddingBottom: insets.bottom || spacing.md },
+            { paddingBottom: Math.max(insets.bottom, spacing.sm) },
           ]}
         >
           <View style={[styles.anonymousRow, { flexDirection: rowDirection }]}>
@@ -216,6 +223,8 @@ export default function ForumPostScreen() {
               onChangeText={setComment}
               multiline
               maxLength={2000}
+              textAlignVertical="center"
+              returnKeyType="default"
             />
             <TouchableOpacity
               style={[
@@ -240,6 +249,9 @@ export default function ForumPostScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  screenContent: {
+    paddingBottom: 0,
+  },
   postContent: {
     paddingBottom: spacing.md,
   },
@@ -344,13 +356,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     gap: spacing.sm,
+    minHeight: 54,
   },
+  
   textInput: {
     flex: 1,
     ...typography.body,
     color: colors.text.primary,
-    maxHeight: 80,
-    paddingVertical: spacing.sm,
+    minHeight: 38,
+    maxHeight: 96,
+    paddingTop: 0,
+    paddingBottom: 0,
   },
   sendBtn: {
     width: 34,
