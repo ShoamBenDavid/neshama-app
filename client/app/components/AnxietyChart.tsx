@@ -51,9 +51,12 @@ function valueToY(v: number): number {
 }
 
 function parseDate(dateStr: string): Date {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return new Date(`${dateStr}T12:00:00`);
+  }
   const d = new Date(dateStr);
   if (!isNaN(d.getTime())) return d;
-  return new Date(dateStr + 'T00:00:00');
+  return new Date(`${dateStr}T12:00:00`);
 }
 
 function formatDateLabel(dateStr: string): string {
@@ -61,13 +64,10 @@ function formatDateLabel(dateStr: string): string {
   return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
+/** Daily chart points have no time — show date only. */
 function formatTooltipDate(dateStr: string): string {
   const d = parseDate(dateStr);
-  const day = d.getDate();
-  const month = d.getMonth() + 1;
-  const hours = d.getHours().toString().padStart(2, '0');
-  const mins = d.getMinutes().toString().padStart(2, '0');
-  return `${day}/${month}  ${hours}:${mins}`;
+  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 }
 
 function buildLinearPath(coords: { x: number; y: number }[]): string {

@@ -33,7 +33,8 @@
           "defaultChannel": "default"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ],
     "owner": "shoam333",
     "extra": {

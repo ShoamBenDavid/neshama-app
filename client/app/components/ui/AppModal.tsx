@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
 import { spacing, borderRadius, shadows } from '../../theme/spacing';
+import { useTranslation } from '../../i18n';
 
 interface AppModalProps {
   visible: boolean;
@@ -29,6 +30,8 @@ export default function AppModal({
   children,
   showCloseButton = true,
 }: AppModalProps) {
+  const { isRTL } = useTranslation();
+
   return (
     <Modal
       visible={visible}
@@ -44,8 +47,20 @@ export default function AppModal({
             <TouchableWithoutFeedback>
               <View style={styles.content}>
                 {(title || showCloseButton) && (
-                  <View style={styles.header}>
-                    <Text style={styles.title}>{title}</Text>
+                  <View
+                    style={[
+                      styles.header,
+                      { flexDirection: isRTL ? 'row-reverse' : 'row' },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.title,
+                        { textAlign: isRTL ? 'right' : 'left' },
+                      ]}
+                    >
+                      {title}
+                    </Text>
                     {showCloseButton && (
                       <TouchableOpacity
                         onPress={onClose}
@@ -87,7 +102,6 @@ const styles = StyleSheet.create({
     ...shadows.xl,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.base,

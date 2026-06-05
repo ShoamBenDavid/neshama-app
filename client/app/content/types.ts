@@ -1,3 +1,5 @@
+import type { AudioAssetId } from '../assets/audio';
+
 export interface BreathingPhase {
   type: 'inhale' | 'hold' | 'exhale' | 'rest';
   duration: number;
@@ -64,8 +66,9 @@ export interface AudioTrack {
   title: string;
   category: string;
   description: string;
-  sourceType: 'tts' | 'url' | 'generated';
+  sourceType: 'tts' | 'url' | 'generated' | 'local';
   sourceUrl?: string;
+  localAssetId?: AudioAssetId;
   ttsScript?: string;
   duration: number;
   icon: string;

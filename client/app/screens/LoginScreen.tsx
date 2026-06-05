@@ -92,6 +92,8 @@ export default function LoginScreen() {
         <Formik
           initialValues={{ email: '', password: '' }}
           validationSchema={LoginSchema}
+          validateOnChange={false}
+          validateOnBlur
           onSubmit={handleLogin}
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (

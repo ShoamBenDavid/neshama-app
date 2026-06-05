@@ -6,6 +6,7 @@ import {
   TextInput,
   Alert,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
@@ -230,6 +231,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     paddingHorizontal: spacing.base,
     paddingVertical: spacing.md,
+    minHeight: 48,
+    ...(Platform.OS === 'ios' ? { lineHeight: 20 } : {}),
   },
   contentInput: {
     ...typography.body,

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInputProps,
   ViewStyle,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../theme/colors';
@@ -34,7 +35,7 @@ export default function Input({
   ...props
 }: InputProps) {
   const [focused, setFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);  
+  const [showPassword, setShowPassword] = useState(false);
   const { isRTL } = useTranslation();
 
   return (
@@ -61,29 +62,26 @@ export default function Input({
           />
         )}
         <TextInput
-  style={[
-    styles.input,
-    {
-      textAlign: isRTL ? 'right' : 'left',
-
-      // Important fix:
-      // Password characters should stay LTR, even inside Hebrew UI.
-      writingDirection: isPassword ? 'ltr' : isRTL ? 'rtl' : 'ltr',
-    },
-    style,
-  ]}
-  placeholderTextColor={colors.text.tertiary}
-  onFocus={(e) => {
-    setFocused(true);
-    props.onFocus?.(e);
-  }}
-  onBlur={(e) => {
-    setFocused(false);
-    props.onBlur?.(e);
-  }}
-  secureTextEntry={isPassword && !showPassword}
-  {...props}
-/>
+          style={[
+            styles.input,
+            {
+              textAlign: isRTL ? 'right' : 'left',
+              writingDirection: isPassword ? 'ltr' : isRTL ? 'rtl' : 'ltr',
+            },
+            style,
+          ]}
+          placeholderTextColor={colors.text.tertiary}
+          onFocus={(e) => {
+            setFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            props.onBlur?.(e);
+          }}
+          secureTextEntry={isPassword && !showPassword}
+          {...props}
+        />
         {isPassword && (
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
@@ -97,16 +95,17 @@ export default function Input({
           </TouchableOpacity>
         )}
       </View>
-      {error && (
-        <Text style={[styles.error, { textAlign: isRTL ? 'right' : 'left' }]}>
-          {error}
-        </Text>
-      )}
-      {hint && !error && (
-        <Text style={[styles.hint, { textAlign: isRTL ? 'right' : 'left' }]}>
-          {hint}
-        </Text>
-      )}
+      <View style={styles.messageSlot}>
+        {error ? (
+          <Text style={[styles.error, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {error}
+          </Text>
+        ) : hint ? (
+          <Text style={[styles.hint, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {hint}
+          </Text>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -134,7 +133,6 @@ const styles = StyleSheet.create({
   },
   inputWrapperFocused: {
     borderColor: colors.primary,
-    ...shadows.md,
   },
   inputWrapperError: {
     borderColor: colors.status.error,
@@ -144,16 +142,21 @@ const styles = StyleSheet.create({
     flex: 1,
     ...typography.body,
     color: colors.text.primary,
-    paddingVertical: spacing.md + 2,
+    paddingVertical: spacing.md,
+    minHeight: 48,
+    ...(Platform.OS === 'ios' ? { lineHeight: 20 } : {}),
+  },
+  messageSlot: {
+    minHeight: 18,
+    justifyContent: 'center',
+    marginTop: spacing.xs,
   },
   error: {
     ...typography.caption,
     color: colors.status.errorDark,
-    marginTop: spacing.xs,
   },
   hint: {
     ...typography.caption,
     color: colors.text.tertiary,
-    marginTop: spacing.xs,
   },
 });

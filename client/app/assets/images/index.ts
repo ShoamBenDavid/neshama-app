@@ -190,12 +190,11 @@ const contentImageById: Record<string, WellnessImageKey> = {
   'yoga-bedtime-yoga': 'yogaBedtime',
   'yoga-strength-flow': 'yogaStrength',
   // Audio
-  'audio-rain-sounds': 'audioRain',
-  'audio-ocean-waves': 'audioOcean',
-  'audio-forest-ambience': 'audioForest',
-  'audio-meditation-bells': 'audioBells',
-  'audio-white-noise': 'audioWhiteNoise',
-  'audio-body-scan-guided': 'audioBodyScan',
+  'audio-tide-of-stillness': 'audioOcean',
+  'audio-drift-into-dusk': 'meditationSleep',
+  'audio-pink-rainfall': 'audioRain',
+  'audio-pine-lullaby': 'audioForest',
+  'audio-lullaby-static': 'audioWhiteNoise',
   // Articles
   'article-understanding-anxiety': 'articleAnxiety',
   'article-power-of-mindfulness': 'articleMindfulness',

@@ -86,6 +86,8 @@ export default function Screen({
           ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets={avoidKeyboard}
         >
           {children}
         </ScrollView>
@@ -106,7 +108,7 @@ export default function Screen({
     </View>
   );
 
-  const wrapped = avoidKeyboard ? (
+  const wrapped = avoidKeyboard && !scrollable ? (
     <KeyboardAvoidingView
       style={styles.flex}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}

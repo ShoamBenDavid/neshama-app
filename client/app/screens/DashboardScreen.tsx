@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -59,6 +59,8 @@ export default function DashboardScreen() {
   const entries = useAppSelector((state) => state.journal.entries);
   const { t, isRTL } = useTranslation();
   const trend = useAnxietyTrend(30);
+  const refreshTrendRef = useRef(trend.refresh);
+  refreshTrendRef.current = trend.refresh;
 
   const [selectedDate, setSelectedDate] = useState(() => toIsoDate(new Date()));
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -71,7 +73,7 @@ export default function DashboardScreen() {
     useCallback(() => {
       dispatch(fetchJournalStats());
       dispatch(fetchJournalEntries({ limit: 365 }));
-      trend.refresh();
+      refreshTrendRef.current();
 
       let active = true;
       setIsAchievementsLoading(true);
@@ -94,7 +96,7 @@ export default function DashboardScreen() {
       return () => {
         active = false;
       };
-    }, [dispatch, trend.refresh]),
+    }, [dispatch]),
   );
 
   const completedIsoDays = useMemo(() => {
@@ -133,9 +135,9 @@ export default function DashboardScreen() {
   }, [currentStreak]);
 
   useEffect(() => {
-    const id = setTimeout(() => trend.refresh(), 1500);
+    const id = setTimeout(() => refreshTrendRef.current(), 1500);
     return () => clearTimeout(id);
-  }, [entries.length, trend.refresh]);
+  }, [entries.length]);
 
   const displayAchievements = useMemo<Achievement[]>(() => {
     const byTarget = new Map<number, Achievement>();

@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableOpacity,
   Switch,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Screen, Header, Button } from '../components/ui';
@@ -206,11 +207,10 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     backgroundColor: colors.surface,
     borderRadius: borderRadius.lg,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
     paddingHorizontal: spacing.base,
     paddingVertical: spacing.md,
-    ...shadows.sm,
+    minHeight: 48,
+    ...(Platform.OS === 'ios' ? { lineHeight: 20 } : {}),
   },
   contentInput: {
     ...typography.body,

@@ -48,6 +48,9 @@ export default function MoodSelector({ selected, onSelect, compact = false }: Mo
               </Text>
               {!compact && (
                 <Text
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
                   style={[
                     styles.label,
                     isSelected && { color: colors.mood[mood.value] },
@@ -98,5 +101,6 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     marginTop: spacing.xs,
     textAlign: 'center',
+    width: '100%',
   },
 });

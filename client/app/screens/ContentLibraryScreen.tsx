@@ -100,7 +100,7 @@ export default function ContentLibraryScreen() {
   const showGrouped = activeFilter === 'all' && !isSearching;
 
   return (
-    <Screen gradient="dawn" scrollable={false} padded={false}>
+    <Screen gradient="dawn" scrollable={false} padded={false}contentContainerStyle={{ paddingBottom: spacing.lg }}>
       <Header
         title={t('content.resources')}
         showBack

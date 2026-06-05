@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   journalAPI,
   type AnxietyTrendPoint,
@@ -24,12 +24,14 @@ export function useAnxietyTrend(initialRange: TimeRange = 30): AnxietyTrendData 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [range, setRange] = useState<TimeRange>(initialRange);
+  const rangeRef = useRef(range);
+  rangeRef.current = range;
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await journalAPI.getAnxietyTrend(range);
+      const response = await journalAPI.getAnxietyTrend(rangeRef.current);
       if (response.success) {
         setPoints(response.data.points);
         setSummary(response.data.summary);
@@ -41,11 +43,11 @@ export function useAnxietyTrend(initialRange: TimeRange = 30): AnxietyTrendData 
     } finally {
       setIsLoading(false);
     }
-  }, [range]);
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [range, fetchData]);
 
   const isEmpty = useMemo(() => points.length === 0, [points]);
 

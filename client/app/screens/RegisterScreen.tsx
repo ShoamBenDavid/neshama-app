@@ -97,6 +97,8 @@ export default function RegisterScreen() {
         <Formik
           initialValues={{ name: '', email: '', password: '', confirmPassword: '' }}
           validationSchema={RegisterSchema}
+          validateOnChange={false}
+          validateOnBlur
           onSubmit={handleRegister}
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (

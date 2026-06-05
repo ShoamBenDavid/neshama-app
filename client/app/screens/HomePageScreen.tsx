@@ -78,7 +78,7 @@ export default function HomePageScreen() {
 
   return (
     <Screen
-     
+    gradient="dawn"
       scrollable
       padded={false}
     >
