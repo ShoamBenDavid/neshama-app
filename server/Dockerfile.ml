@@ -3,7 +3,6 @@ FROM python:3.11-slim
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
-ENV ML_LOAD_ON_STARTUP=1
 
 COPY ml-service/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

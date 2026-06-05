@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Screen, Header, WellnessCard } from '../components/ui';
 import { spacing } from '../theme/spacing';
 import { getBreathingExercises } from '../content/localizedContent';
-import { wellnessImages } from '../assets/images';
+import { pickImageForContent } from '../assets/images';
 import type { RootStackParamList } from '../navigation/StackNavigator';
 import { useTranslation } from '../i18n';
 
@@ -34,7 +34,11 @@ export default function BreathingExercisesScreen() {
             <WellnessCard
               title={item.name}
               subtitle={`${Math.max(1, Math.floor(item.duration / 60))} ${t('common.min')}`}
-              image={wellnessImages.breathingFlow}
+              image={pickImageForContent({
+                id: `breathing-${item.id}`,
+                category: 'breathing',
+                type: 'breathing',
+              })}
               size="sm"
               duration={`${Math.max(1, Math.floor(item.duration / 60))} ${t('common.min')}`}
               onPress={() =>

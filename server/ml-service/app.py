@@ -107,8 +107,24 @@ def health():
     return jsonify({'status': 'ok', 'model_loaded': model is not None})
 
 
+@app.route('/warmup', methods=['GET'])
+def warmup():
+    if model is None or tokenizer is None:
+        load_model_and_tokenizer()
+
+    return jsonify({'status': 'ok', 'model_loaded': True})
+
+
+@app.route('/', methods=['GET'])
+def root():
+    return jsonify({
+        'status': 'ok',
+        'service': 'neshama-ml-service',
+        'health': '/health',
+        'classify': '/classify',
+    })
+
+
 if __name__ == '__main__':
     load_model_and_tokenizer()
     app.run(host='0.0.0.0', port=5001, debug=False)
-elif os.environ.get('ML_LOAD_ON_STARTUP') == '1':
-    load_model_and_tokenizer()

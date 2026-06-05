@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PulseAnimation, TimerCircle } from '../animations';
 import { speakText, stopSpeaking, splitScriptIntoSegments } from '../../services/tts';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
-import { spacing, borderRadius, shadows } from '../../theme/spacing';
+import { spacing, shadows } from '../../theme/spacing';
 import { useTranslation } from '../../i18n';
 
 interface MeditationPlayerProps {
@@ -28,8 +28,50 @@ export default function MeditationPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [currentSegment, setCurrentSegment] = useState(0);
+  const isPlayingRef = useRef(false);
+  const segmentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playbackSessionRef = useRef(0);
   const totalSeconds = durationMinutes * 60;
   const segments = splitScriptIntoSegments(script);
+
+  const clearSegmentTimeout = useCallback(() => {
+    if (segmentTimeoutRef.current) {
+      clearTimeout(segmentTimeoutRef.current);
+      segmentTimeoutRef.current = null;
+    }
+  }, []);
+
+  const invalidatePlayback = useCallback(() => {
+    playbackSessionRef.current += 1;
+    clearSegmentTimeout();
+    stopSpeaking();
+  }, [clearSegmentTimeout]);
+
+  const playSegment = useCallback(
+    (index: number, session: number) => {
+      if (session !== playbackSessionRef.current) return;
+      if (index >= segments.length) {
+        onComplete?.();
+        return;
+      }
+
+      speakText(segments[index], {
+        rate: 0.8,
+        onDone: () => {
+          if (session !== playbackSessionRef.current) return;
+          const nextIndex = index + 1;
+          setCurrentSegment(nextIndex);
+          if (nextIndex < segments.length && isPlayingRef.current) {
+            segmentTimeoutRef.current = setTimeout(() => {
+              segmentTimeoutRef.current = null;
+              playSegment(nextIndex, session);
+            }, 2000);
+          }
+        },
+      });
+    },
+    [segments, onComplete],
+  );
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -37,8 +79,9 @@ export default function MeditationPlayer({
       interval = setInterval(() => {
         setElapsed((prev) => {
           if (prev >= totalSeconds) {
+            isPlayingRef.current = false;
             setIsPlaying(false);
-            stopSpeaking();
+            invalidatePlayback();
             onComplete?.();
             return totalSeconds;
           }
@@ -47,44 +90,47 @@ export default function MeditationPlayer({
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, totalSeconds, onComplete]);
+  }, [isPlaying, totalSeconds, onComplete, invalidatePlayback]);
+
+  useEffect(() => {
+    return () => {
+      playbackSessionRef.current += 1;
+      clearSegmentTimeout();
+      stopSpeaking();
+    };
+  }, [clearSegmentTimeout]);
 
   const handlePlay = useCallback(() => {
+    isPlayingRef.current = true;
     setIsPlaying(true);
     if (segments.length > 0) {
-      playSegment(currentSegment);
+      playSegment(currentSegment, playbackSessionRef.current);
     }
-  }, [currentSegment, segments]);
+  }, [currentSegment, segments.length, playSegment]);
 
   const handlePause = useCallback(() => {
+    isPlayingRef.current = false;
     setIsPlaying(false);
-    stopSpeaking();
-  }, []);
+    invalidatePlayback();
+  }, [invalidatePlayback]);
 
   const handleStop = useCallback(() => {
+    isPlayingRef.current = false;
     setIsPlaying(false);
     setElapsed(0);
     setCurrentSegment(0);
-    stopSpeaking();
-  }, []);
+    invalidatePlayback();
+  }, [invalidatePlayback]);
 
-  const playSegment = (index: number) => {
-    if (index >= segments.length) {
-      onComplete?.();
-      return;
+  const handleSkip = useCallback(() => {
+    if (currentSegment >= segments.length - 1) return;
+    invalidatePlayback();
+    const next = currentSegment + 1;
+    setCurrentSegment(next);
+    if (isPlayingRef.current) {
+      playSegment(next, playbackSessionRef.current);
     }
-
-    speakText(segments[index], {
-      rate: 0.8,
-      onDone: () => {
-        const nextIndex = index + 1;
-        setCurrentSegment(nextIndex);
-        if (nextIndex < segments.length && isPlaying) {
-          setTimeout(() => playSegment(nextIndex), 2000);
-        }
-      },
-    });
-  };
+  }, [currentSegment, segments.length, invalidatePlayback, playSegment]);
 
   const progressPercent = Math.min((elapsed / totalSeconds) * 100, 100);
   const currentText =
@@ -136,14 +182,7 @@ export default function MeditationPlayer({
 
         <TouchableOpacity
           style={styles.controlButton}
-          onPress={() => {
-            if (currentSegment < segments.length - 1) {
-              stopSpeaking();
-              const next = currentSegment + 1;
-              setCurrentSegment(next);
-              if (isPlaying) playSegment(next);
-            }
-          }}
+          onPress={handleSkip}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <Ionicons
