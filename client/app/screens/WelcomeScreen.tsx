@@ -19,11 +19,6 @@ export default function WelcomeScreen() {
   const navigation = useNavigation<Nav>();
   const { t } = useTranslation();
 
-  const features: { icon: keyof typeof Ionicons.glyphMap; key: string }[] = [
-    { icon: 'journal-outline', key: 'welcome.featureJournal' },
-    { icon: 'chatbubble-ellipses-outline', key: 'welcome.featureAI' },
-    { icon: 'people-outline', key: 'welcome.featureCommunity' },
-  ];
 
   return (
     <LinearGradient
@@ -37,7 +32,7 @@ export default function WelcomeScreen() {
    
               <Image source={require('../assets/logo.png')} style={styles.logoImage} />
             
-          <Text style={styles.appName}>{t('welcome.appName')}</Text>
+          
           <Text style={styles.tagline}>{t('welcome.tagline')}</Text>
         </View>
 

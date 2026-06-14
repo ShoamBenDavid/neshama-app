@@ -1,15 +1,19 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 
 import {
   Screen,
   AppHeader,
+  Card,
   SectionHeader,
   WellnessCard,
 } from '../components/ui';
 import { CrisisBanner, HotlineCard } from '../components/support';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 import { spacing } from '../theme/spacing';
 import type { RootStackParamList } from '../navigation/StackNavigator';
 import { useTranslation } from '../i18n';
@@ -20,7 +24,9 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export default function SupportCenterScreen() {
   const navigation = useNavigation<Nav>();
-  const { t, language } = useTranslation();
+  const { t, language, isRTL } = useTranslation();
+  const rowDirection = isRTL ? 'row-reverse' : 'row';
+  const textAlign = isRTL ? 'right' : 'left';
 
   const services = useMemo(() => getSupportServices(language), [language]);
 
@@ -80,6 +86,29 @@ export default function SupportCenterScreen() {
       </View>
 
       <View style={styles.sectionHeaderWrap}>
+        <SectionHeader title={t('support.disclaimerTitle')} />
+      </View>
+      <View style={styles.section}>
+        <Card variant="outlined" style={styles.disclaimerCard}>
+          <View style={[styles.disclaimerHeader, { flexDirection: rowDirection }]}>
+            <View style={styles.disclaimerIcon}>
+              <Ionicons
+                name="information-circle"
+                size={20}
+                color={colors.status.infoDark}
+              />
+            </View>
+            <Text style={[styles.disclaimerTitle, { textAlign }]}>
+              {t('support.disclaimerCardTitle')}
+            </Text>
+          </View>
+          <Text style={[styles.disclaimerText, { textAlign }]}>
+            {t('support.disclaimerText')}
+          </Text>
+        </Card>
+      </View>
+
+      <View style={styles.sectionHeaderWrap}>
         <SectionHeader title={t('support.helpfulNow')} />
       </View>
 
@@ -117,5 +146,32 @@ const styles = StyleSheet.create({
   },
   tileWrap: {
     width: '48%',
+  },
+  disclaimerCard: {
+    backgroundColor: colors.surfaces.cardSoft,
+    borderColor: colors.status.info + '55',
+  },
+  disclaimerHeader: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  disclaimerIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.status.info + '18',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  disclaimerTitle: {
+    ...typography.bodyMedium,
+    color: colors.text.primary,
+    flex: 1,
+  },
+  disclaimerText: {
+    ...typography.bodySm,
+    color: colors.text.secondary,
+    lineHeight: 23,
   },
 });

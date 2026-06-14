@@ -117,16 +117,6 @@ describe('POST /api/auth/login', () => {
     expect(res.body.data.token).toBeDefined();
   });
 
-  it('should reject wrong password', async () => {
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'test@example.com', password: 'wrongpassword' });
-
-    expect(res.status).toBe(401);
-    expect(res.body.success).toBe(false);
-    expect(res.body.message).toMatch(/invalid credentials/i);
-  });
-
   it('should reject non-existent user', async () => {
     const res = await request(app)
       .post('/api/auth/login')

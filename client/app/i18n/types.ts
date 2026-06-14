@@ -387,6 +387,9 @@ export interface TranslationDictionary {
     warmTitle: string;
     warmSubtitle: string;
     crisisBannerWarm: string;
+    disclaimerTitle: string;
+    disclaimerCardTitle: string;
+    disclaimerText: string;
     helpfulNow: string;
   };
   content: {
@@ -587,6 +590,9 @@ export interface TranslationDictionary {
     title: string;
     mission: string;
     missionText: string;
+    disclaimer: string;
+    disclaimerTitle: string;
+    disclaimerText: string;
     whatWeOffer: string;
     featureChat: string;
     featureChatDesc: string;

@@ -109,6 +109,25 @@ export default function AboutNeshamaScreen({ navigation }: Props) {
         </Text>
       </Card>
 
+      <SectionHeader title={t('aboutApp.disclaimer')} />
+      <Card style={styles.disclaimerCard} variant="outlined">
+        <View style={[styles.disclaimerHeader, { flexDirection: rowDirection }]}>
+          <View style={styles.disclaimerIconWrap}>
+            <Ionicons
+              name="information-circle"
+              size={20}
+              color={colors.status.infoDark}
+            />
+          </View>
+          <Text style={[styles.disclaimerTitle, { textAlign }]}>
+            {t('aboutApp.disclaimerTitle')}
+          </Text>
+        </View>
+        <Text style={[styles.disclaimerText, { textAlign }]}>
+          {t('aboutApp.disclaimerText')}
+        </Text>
+      </Card>
+
       <SectionHeader title={t('aboutApp.whatWeOffer')} />
       <Card style={styles.card}>
         <FeatureItem
@@ -292,6 +311,34 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.text.secondary,
     lineHeight: 24,
+  },
+  disclaimerCard: {
+    marginBottom: spacing.sm,
+    backgroundColor: colors.surfaces.cardSoft,
+    borderColor: colors.status.info + '55',
+  },
+  disclaimerHeader: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  disclaimerIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.status.info + '18',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  disclaimerTitle: {
+    ...typography.bodyMedium,
+    color: colors.text.primary,
+    flex: 1,
+  },
+  disclaimerText: {
+    ...typography.bodySm,
+    color: colors.text.secondary,
+    lineHeight: 23,
   },
   divider: {
     height: StyleSheet.hairlineWidth,

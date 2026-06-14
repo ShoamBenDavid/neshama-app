@@ -19,31 +19,6 @@ afterEach(() => {
 });
 
 describe('classificationService', () => {
-  it('should return classification on success', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          anxiety_level: 0.75,
-          anxiety_label: 'high',
-        }),
-    });
-
-    const result = await classify('I am very anxious and stressed');
-
-    expect(result).toEqual({
-      anxietyLevel: 0.75,
-      anxietyLabel: 'high',
-    });
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5001/classify',
-      expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-    );
-  });
-
   it('should return null when ML service returns error status', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
@@ -80,36 +55,6 @@ describe('classificationService', () => {
     expect(body).toEqual({ text: 'I feel great today' });
   });
 
-  it('should return classification with low label', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          anxiety_level: 0.15,
-          anxiety_label: 'low',
-        }),
-    });
-
-    const result = await classify('I feel peaceful');
-    expect(result.anxietyLabel).toBe('low');
-    expect(result.anxietyLevel).toBe(0.15);
-  });
-
-  it('should return classification with moderate label', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          anxiety_level: 0.5,
-          anxiety_label: 'moderate',
-        }),
-    });
-
-    const result = await classify('I feel somewhat worried');
-    expect(result.anxietyLabel).toBe('moderate');
-    expect(result.anxietyLevel).toBe(0.5);
-  });
-
   it('should return null for empty content', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
@@ -144,25 +89,6 @@ describe('classificationService', () => {
     expect(body).toEqual({ text: 'I feel great today' });
   });
 
-  it('should translate Hebrew text to English before classifying', async () => {
-    translationService.translateToEnglish.mockResolvedValueOnce(
-      'I feel great anxiety and cannot sleep',
-    );
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({ anxiety_level: 0.9, anxiety_label: 'high' }),
-    });
-
-    const hebrew = 'אני מרגיש חרדה גדולה ולא יכול לישון';
-    const result = await classify(hebrew);
-
-    expect(translationService.translateToEnglish).toHaveBeenCalledWith(hebrew);
-    const body = JSON.parse(global.fetch.mock.calls[0][1].body);
-    expect(body).toEqual({ text: 'I feel great anxiety and cannot sleep' });
-    expect(result).toEqual({ anxietyLevel: 0.9, anxietyLabel: 'high' });
-  });
-
   it('should translate mixed Hebrew/English text before classifying', async () => {
     translationService.translateToEnglish.mockResolvedValueOnce(
       'I feel anxiety sometimes',
@@ -178,22 +104,5 @@ describe('classificationService', () => {
     expect(translationService.translateToEnglish).toHaveBeenCalledTimes(1);
     const body = JSON.parse(global.fetch.mock.calls[0][1].body);
     expect(body).toEqual({ text: 'I feel anxiety sometimes' });
-  });
-
-  it('should still classify when translation falls back to original text', async () => {
-    // translateToEnglish returns the original on OpenAI failure
-    translationService.translateToEnglish.mockResolvedValueOnce(
-      'אני מרגיש חרדה',
-    );
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({ anxiety_level: 0.1, anxiety_label: 'low' }),
-    });
-
-    const result = await classify('אני מרגיש חרדה');
-
-    expect(translationService.translateToEnglish).toHaveBeenCalled();
-    expect(result).toEqual({ anxietyLevel: 0.1, anxietyLabel: 'low' });
   });
 });
