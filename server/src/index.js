@@ -10,6 +10,7 @@ const journalRoutes = require('./routes/journalRoutes');
 const forumRoutes = require('./routes/forumRoutes');
 const contentRoutes = require('./routes/contentRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // Initialize express app
 const app = express();
@@ -36,6 +37,7 @@ app.use('/api/journal', journalRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {

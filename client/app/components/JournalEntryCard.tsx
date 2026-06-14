@@ -42,13 +42,18 @@ export default function JournalEntryCard({ entry, onPress }: JournalEntryCardPro
     return translated === `tags.${normalizedTag}` ? tag : translated;
   };
 
-  const getAnxietyLabel = (label: string) => {
+  const getClassificationLabel = (label: string) => {
     const normalizedLabel = label.trim().toLowerCase();
+    if (normalizedLabel === 'normal') return t('journal.classificationNormal');
+    if (normalizedLabel === 'anxiety') return t('journal.classificationAnxiety');
+    if (normalizedLabel === 'depression') return t('journal.classificationDepression');
     if (normalizedLabel === 'high') return t('journal.anxietyLevelHigh');
     if (normalizedLabel === 'moderate') return t('journal.anxietyLevelModerate');
     if (normalizedLabel === 'low') return t('journal.anxietyLevelLow');
     return label;
   };
+
+  const classificationLabel = entry.classification?.category ?? entry.anxietyLabel;
 
   return (
     <TouchableOpacity
@@ -109,13 +114,15 @@ export default function JournalEntryCard({ entry, onPress }: JournalEntryCardPro
         </View>
       )}
 
-      {entry.anxietyLabel && (
+      {classificationLabel && (
         <View
           style={[styles.anxietyRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}
         >
           <Ionicons name="pulse-outline" size={14} color={colors.text.muted} />
           <Text style={styles.anxietyText}>
-            {t('journal.anxietyLabel', { label: getAnxietyLabel(entry.anxietyLabel) })}
+            {t('journal.classificationLabel', {
+              label: getClassificationLabel(classificationLabel),
+            })}
           </Text>
         </View>
       )}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,11 +11,12 @@ import {
   ErrorState,
   SectionHeader,
 } from '../components/ui';
-import AnxietyChart from '../components/AnxietyChart';
 import {
   ProgressBadge,
   StreakCalendar,
   AchievementsSection,
+  EmotionalDistributionCard,
+  EmotionalTrendChart,
 } from '../components/dashboard';
 import { borderRadius, shadows, spacing } from '../theme/spacing';
 import { colors } from '../theme/colors';
@@ -25,8 +26,13 @@ import {
   fetchJournalStats,
   fetchJournalEntries,
 } from '../store/slices/journalSlice';
+import {
+  fetchDashboardSummary,
+  fetchDashboardTrends,
+  setSelectedRange,
+} from '../store/slices/dashboardSlice';
+import type { DashboardRange } from '../services/api';
 import { useTranslation } from '../i18n';
-import { useAnxietyTrend } from '../hooks/useAnxietyTrend';
 import { authAPI } from '../services/api';
 import type { Achievement } from '../types/progress';
 import {
@@ -57,10 +63,11 @@ export default function DashboardScreen() {
   );
   const error = useAppSelector((state) => state.journal.error);
   const entries = useAppSelector((state) => state.journal.entries);
+  const selectedRange = useAppSelector((state) => state.dashboard.selectedRange);
+  const wellnessTrends = useAppSelector(
+    (state) => state.dashboard.trendsByRange[state.dashboard.selectedRange],
+  );
   const { t, isRTL } = useTranslation();
-  const trend = useAnxietyTrend(30);
-  const refreshTrendRef = useRef(trend.refresh);
-  refreshTrendRef.current = trend.refresh;
 
   const [selectedDate, setSelectedDate] = useState(() => toIsoDate(new Date()));
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -73,7 +80,8 @@ export default function DashboardScreen() {
     useCallback(() => {
       dispatch(fetchJournalStats());
       dispatch(fetchJournalEntries({ limit: 365 }));
-      refreshTrendRef.current();
+      dispatch(fetchDashboardSummary());
+      dispatch(fetchDashboardTrends(selectedRange));
 
       let active = true;
       setIsAchievementsLoading(true);
@@ -134,10 +142,13 @@ export default function DashboardScreen() {
     return 30;
   }, [currentStreak]);
 
-  useEffect(() => {
-    const id = setTimeout(() => refreshTrendRef.current(), 1500);
-    return () => clearTimeout(id);
-  }, [entries.length]);
+  const handleRangeChange = useCallback(
+    (range: DashboardRange) => {
+      dispatch(setSelectedRange(range));
+      dispatch(fetchDashboardTrends(range));
+    },
+    [dispatch],
+  );
 
   const displayAchievements = useMemo<Achievement[]>(() => {
     const byTarget = new Map<number, Achievement>();
@@ -255,6 +266,17 @@ export default function DashboardScreen() {
 
      
 
+      <EmotionalTrendChart
+        series={wellnessTrends?.series ?? []}
+        trends={wellnessTrends ?? null}
+        range={selectedRange}
+        onRangeChange={handleRangeChange}
+      />
+
+      <EmotionalDistributionCard
+        distribution={wellnessTrends?.distribution ?? null}
+      />
+
       <View style={styles.sectionHeaderWrap}>
         <SectionHeader title={t('dashboard.myPath')} />
       </View>
@@ -276,21 +298,6 @@ export default function DashboardScreen() {
         error={achievementsError}
       />
 
-      <View style={styles.sectionHeaderWrap}>
-        <SectionHeader
-          title={t('dashboard.sensitivityShifts')}
-          subtitle={t('dashboard.sensitivitySubtitle')}
-        />
-      </View>
-
-      <View style={styles.chartWrap}>
-        <AnxietyChart
-          points={trend.points}
-          summary={trend.summary}
-          range={trend.range}
-          onRangeChange={trend.setRange}
-        />
-      </View>
     </Screen>
   );
 }
@@ -302,10 +309,6 @@ const styles = StyleSheet.create({
   cardWrap: {
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.base,
-  },
-  chartWrap: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.lg,
   },
   profileActionWrap: {
     paddingHorizontal: spacing.lg,

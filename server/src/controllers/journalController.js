@@ -12,6 +12,14 @@ const ANXIETY_LABEL_VALUES = {
 const roundToTwo = (value) => Math.round(value * 100) / 100;
 
 const getAnxietyScore = (entry) => {
+  const anxietyProbability = entry.classification?.probabilities?.anxiety;
+  if (
+    typeof anxietyProbability === 'number' &&
+    !Number.isNaN(anxietyProbability)
+  ) {
+    return Math.max(0, Math.min(1, anxietyProbability));
+  }
+
   if (typeof entry.anxietyLevel === 'number' && !Number.isNaN(entry.anxietyLevel)) {
     return Math.max(0, Math.min(1, entry.anxietyLevel));
   }
@@ -126,6 +134,7 @@ const getEntries = async (req, res) => {
           title: entry.title,
           content: entry.content,
           tags: entry.tags,
+          classification: entry.classification,
           anxietyLevel: entry.anxietyLevel,
           anxietyLabel: entry.anxietyLabel,
           createdAt: entry.createdAt,
@@ -170,9 +179,11 @@ const createEntry = async (req, res) => {
       tags: tags || [],
     });
 
-    // Run anxiety classification in the background, update entry when done
+    // Run ML classification and update the entry with the real model category:
+    // normal / anxiety / depression.
     const classification = await classificationService.classify(content);
     if (classification) {
+      entry.classification = classification.classification;
       entry.anxietyLevel = classification.anxietyLevel;
       entry.anxietyLabel = classification.anxietyLabel;
       await entry.save();
@@ -190,6 +201,7 @@ const createEntry = async (req, res) => {
           title: entry.title,
           content: entry.content,
           tags: entry.tags,
+          classification: entry.classification,
           anxietyLevel: entry.anxietyLevel,
           anxietyLabel: entry.anxietyLabel,
           createdAt: entry.createdAt,
@@ -233,6 +245,7 @@ const getEntry = async (req, res) => {
           title: entry.title,
           content: entry.content,
           tags: entry.tags,
+          classification: entry.classification,
           anxietyLevel: entry.anxietyLevel,
           anxietyLabel: entry.anxietyLabel,
           createdAt: entry.createdAt,
@@ -286,6 +299,7 @@ const updateEntry = async (req, res) => {
           title: entry.title,
           content: entry.content,
           tags: entry.tags,
+          classification: entry.classification,
           anxietyLevel: entry.anxietyLevel,
           anxietyLabel: entry.anxietyLabel,
           createdAt: entry.createdAt,
@@ -376,10 +390,10 @@ const getStats = async (req, res) => {
     
     const goodDays = monthEntries.filter(e => e.mood >= 4).length;
 
-    // Calculate real anxiety stats from classified entries
-    const classifiedEntries = monthEntries.filter(e => e.anxietyLevel != null);
+    // Calculate anxiety stats from the model's anxiety probability.
+    const classifiedEntries = monthEntries.filter(e => getAnxietyScore(e) !== null);
     const avgAnxiety = classifiedEntries.length > 0
-      ? classifiedEntries.reduce((sum, e) => sum + e.anxietyLevel, 0) / classifiedEntries.length
+      ? classifiedEntries.reduce((sum, e) => sum + getAnxietyScore(e), 0) / classifiedEntries.length
       : 0;
     const anxietyReduction = Math.round((1 - avgAnxiety) * 100);
 
@@ -441,6 +455,7 @@ const getAnxietyTrend = async (req, res) => {
       user: userId,
       date: { $gte: startDate },
       $or: [
+        { 'classification.probabilities.anxiety': { $ne: null } },
         { anxietyLevel: { $ne: null } },
         { anxietyLabel: { $in: ['low', 'moderate', 'medium', 'high'] } },
       ],

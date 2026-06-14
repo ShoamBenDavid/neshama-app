@@ -41,8 +41,11 @@ export default function JournalEntryScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const getAnxietyLabel = (label: string) => {
+  const getClassificationLabel = (label: string) => {
     const normalizedLabel = label.trim().toLowerCase();
+    if (normalizedLabel === 'normal') return t('journal.classificationNormal');
+    if (normalizedLabel === 'anxiety') return t('journal.classificationAnxiety');
+    if (normalizedLabel === 'depression') return t('journal.classificationDepression');
     if (normalizedLabel === 'high') return t('journal.anxietyLevelHigh');
     if (normalizedLabel === 'moderate')
       return t('journal.anxietyLevelModerate');
@@ -103,6 +106,7 @@ export default function JournalEntryScreen() {
 
   const moodColor = colors.mood[entry.mood] ?? colors.brand.lavender;
   const moodLabel = getMoodLabel(entry.mood);
+  const classificationLabel = entry.classification?.category ?? entry.anxietyLabel;
 
   return (
     <Screen padded={false} scrollable>
@@ -163,7 +167,7 @@ export default function JournalEntryScreen() {
               </Text>
             </View>
           </View>
-          {entry.anxietyLabel && (
+          {classificationLabel && (
             <View
               style={[
                 styles.anxietyBadge,
@@ -176,8 +180,8 @@ export default function JournalEntryScreen() {
                 color={colors.text.muted}
               />
               <Text style={styles.anxietyText}>
-                {t('journal.anxietyLabel', {
-                  label: getAnxietyLabel(entry.anxietyLabel),
+                {t('journal.classificationLabel', {
+                  label: getClassificationLabel(classificationLabel),
                 })}
               </Text>
             </View>

@@ -89,7 +89,9 @@ export default function CreateJournalScreen() {
 
     if (createJournalEntry.fulfilled.match(result)) {
       // Open the post-save reflection sheet with the classification label.
-      const label = (result.payload?.anxietyLabel ?? null) as string | null;
+      const label = (result.payload?.classification?.category ??
+        result.payload?.anxietyLabel ??
+        null) as string | null;
       setReflection({ label });
     } else {
       Alert.alert(t('common.error'), t('journal.saveFailed'));

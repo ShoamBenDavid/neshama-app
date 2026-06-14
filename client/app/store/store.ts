@@ -4,6 +4,7 @@ import journalReducer from './slices/journalSlice';
 import forumReducer from './slices/forumSlice';
 import contentReducer from './slices/contentSlice';
 import chatReducer from './slices/chatSlice';
+import dashboardReducer from './slices/dashboardSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     forum: forumReducer,
     content: contentReducer,
     chat: chatReducer,
+    dashboard: dashboardReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

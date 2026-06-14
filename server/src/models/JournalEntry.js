@@ -42,6 +42,47 @@ const JournalEntrySchema = new mongoose.Schema(
       enum: ['low', 'moderate', 'medium', 'high', null],
       default: null,
     },
+    classification: {
+      category: {
+        type: String,
+        enum: ['normal', 'anxiety', 'depression', null],
+        default: null,
+      },
+      probabilities: {
+        normal: {
+          type: Number,
+          min: 0,
+          max: 1,
+          default: null,
+        },
+        anxiety: {
+          type: Number,
+          min: 0,
+          max: 1,
+          default: null,
+        },
+        depression: {
+          type: Number,
+          min: 0,
+          max: 1,
+          default: null,
+        },
+      },
+      confidence: {
+        type: Number,
+        min: 0,
+        max: 1,
+        default: null,
+      },
+      modelVersion: {
+        type: String,
+        default: null,
+      },
+      classifiedAt: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   {
     timestamps: true,

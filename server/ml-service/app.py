@@ -59,23 +59,42 @@ def classify_text(text):
     if model is None or tokenizer is None:
         load_model_and_tokenizer()
 
+    print(f"\n{'='*60}")
+    print(f"INPUT TEXT: {text}")
+    print(f"{'='*60}")
+
     sequences = tokenizer.texts_to_sequences([text])
+    num_known = sum(1 for token in sequences[0] if token != 0)
+    num_words = len(text.split())
+    print(f"Tokenization: {num_words} words -> {num_known} known tokens (out of {len(sequences[0])} total)")
+
     padded = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH, padding='post', truncating='post')
     prediction = model.predict(padded, verbose=0)
-
     output = prediction[0]
-    # 3-class model: [low/none, moderate, high]
+
+    # The Neshama V4 model was trained as:
+    #   0 = normal, 1 = anxiety, 2 = depression
+    label_map = {0: 'normal', 1: 'anxiety', 2: 'depression'}
     class_idx = int(np.argmax(output))
     confidence = float(output[class_idx])
+    label = label_map.get(class_idx, 'unknown')
 
-    label_map = {0: 'low', 1: 'moderate', 2: 'high'}
-    label = label_map.get(class_idx, 'low')
+    probabilities = {
+        'normal': float(output[0]),
+        'anxiety': float(output[1]),
+        'depression': float(output[2]),
+    }
 
-    # Anxiety score: combine moderate + high probabilities (skip class 0 = no anxiety)
-    anxiety_score = float(output[1] + output[2]) if len(output) == 3 else confidence
+    print("\nPROBABILITIES:")
+    for i, prob in enumerate(output):
+        class_name = label_map.get(i, f'class_{i}')
+        marker = " <-- CHOSEN" if i == class_idx else ""
+        print(f"  {class_name:>10}: {float(prob):.6f} ({float(prob)*100:.2f}%){marker}")
 
-    print(f"Prediction: {output} -> class={class_idx} ({label}), anxiety_score={anxiety_score:.4f}")
-    return anxiety_score, label
+    print(f"\nRESULT: {label} (confidence={confidence:.4f})")
+    print(f"{'='*60}\n")
+
+    return label, confidence, probabilities
 
 
 @app.route('/classify', methods=['POST'])
@@ -92,10 +111,15 @@ def classify_endpoint():
         return jsonify({'error': 'Empty text'}), 400
 
     try:
-        score, label = classify_text(text)
+        category, confidence, probabilities = classify_text(text)
+
         return jsonify({
-            'anxiety_level': round(score, 4),
-            'anxiety_label': label,
+            'category': category,
+            'confidence': round(confidence, 4),
+            'probabilities': probabilities,
+            # Backwards compatibility for any old client still reading this key.
+            'predicted_class': category,
+            'probabilities_breakdown': probabilities,
         })
     except Exception as e:
         print(f"Classification error: {e}")

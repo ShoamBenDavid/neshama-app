@@ -22,7 +22,7 @@ export type ReflectionAction = 'breath' | 'chat' | 'support' | 'continue';
 
 interface PostSaveReflectionSheetProps {
   visible: boolean;
-  /** anxietyLabel from the server: 'low' | 'moderate' | 'high' | null. */
+  /** Model category from the server: normal / anxiety / depression. */
   anxietyLabel: string | null;
   onClose: (next?: ReflectionAction) => void;
 }
@@ -32,9 +32,9 @@ type Tone = 'low' | 'moderate' | 'high' | 'neutral';
 const toneForLabel = (label: string | null): Tone => {
   if (!label) return 'neutral';
   const normalized = label.trim().toLowerCase();
-  if (normalized === 'high') return 'high';
-  if (normalized === 'moderate') return 'moderate';
-  if (normalized === 'low') return 'low';
+  if (normalized === 'depression' || normalized === 'high') return 'high';
+  if (normalized === 'anxiety' || normalized === 'moderate') return 'moderate';
+  if (normalized === 'normal' || normalized === 'low') return 'low';
   return 'neutral';
 };
 
@@ -53,9 +53,8 @@ const toneIcon: Record<Tone, React.ComponentProps<typeof Ionicons>['name']> = {
 };
 
 /**
- * Post-save reflection sheet. Reveals the anxiety classification gently
- * with supportive microcopy and three tonal variants (low / moderate /
- * high). Never diagnoses — always offers a non-action exit.
+ * Post-save reflection sheet. Reveals the model classification gently with
+ * supportive microcopy. Never diagnoses — always offers a non-action exit.
  */
 export default function PostSaveReflectionSheet({
   visible,

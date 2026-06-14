@@ -180,6 +180,37 @@ export interface TranslationDictionary {
     achievementStreak7Desc: string;
     achievementStreak14Desc: string;
     achievementStreak30Desc: string;
+    wellness: {
+      sectionTitle: string;
+      scoreLabel: string;
+      trendImproving: string;
+      trendStable: string;
+      trendWorsening: string;
+      streakLabel: string;
+      weekOverWeek: string;
+      distributionTitle: string;
+      distributionSubtitle: string;
+      categoryNormal: string;
+      categoryAnxiety: string;
+      categoryDepression: string;
+      trendChartTitle: string;
+      trendChartSubtitle: string;
+      yAxisLabel: string;
+      xAxisLabel: string;
+      wellnessScore: string;
+      noData: string;
+      range1: string;
+      range7: string;
+      range30: string;
+      range90: string;
+      positiveDays: string;
+      stability: string;
+      msgImproving: string;
+      msgWorsening: string;
+      msgSlightlyBetter: string;
+      msgSteady: string;
+      msgKeepJournaling: string;
+    };
   };
   journal: {
     title: string;
@@ -208,6 +239,10 @@ export interface TranslationDictionary {
     anxietyLevelLow: string;
     anxietyLevelModerate: string;
     anxietyLevelHigh: string;
+    classificationLabel: string;
+    classificationNormal: string;
+    classificationAnxiety: string;
+    classificationDepression: string;
     tags: string;
     deleteEntry: string;
     deleteConfirmation: string;

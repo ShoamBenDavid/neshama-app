@@ -5,3 +5,6 @@ export { default as CalendarStrip } from './CalendarStrip';
 export { default as StreakCalendar } from './StreakCalendar';
 export { default as AchievementBadge } from './AchievementBadge';
 export { default as AchievementsSection } from './AchievementsSection';
+export { default as WellnessHeroCard } from './WellnessHeroCard';
+export { default as EmotionalDistributionCard } from './EmotionalDistributionCard';
+export { default as EmotionalTrendChart } from './EmotionalTrendChart';

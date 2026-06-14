@@ -62,6 +62,17 @@ export interface JournalEntry {
   title?: string;
   content: string;
   tags: string[];
+  classification?: {
+    category?: WellnessCategory | null;
+    probabilities?: {
+      normal?: number | null;
+      anxiety?: number | null;
+      depression?: number | null;
+    };
+    confidence?: number | null;
+    modelVersion?: string | null;
+    classifiedAt?: string | null;
+  };
   anxietyLevel?: number;
   anxietyLabel?: string;
   createdAt: string;
@@ -97,6 +108,56 @@ export interface AnxietyTrendSummary {
   trendDirection: 'improving' | 'increasing' | 'stable';
   trendPercent: number;
   peakDay: { date: string; anxiety: number } | null;
+}
+
+// Dashboard Types
+export type WellnessCategory = 'normal' | 'anxiety' | 'depression';
+export type TrendDirection = 'improving' | 'stable' | 'worsening';
+export type DashboardRange = 1 | 7 | 30 | 90;
+
+export interface WellnessDistribution {
+  normal: number;
+  anxiety: number;
+  depression: number;
+  classifiedEntries: number;
+}
+
+export interface DashboardSummary {
+  wellnessScore: number;
+  weeklyScore: number;
+  positiveStreak: number;
+  trend: {
+    direction: TrendDirection;
+    slope: number;
+    weekOverWeek: number | null;
+  };
+  distribution: WellnessDistribution;
+  stability: number;
+  classifiedDays: number;
+  hasEnoughData: boolean;
+  summaryMessageKey: string;
+}
+
+export interface DashboardTrendPoint {
+  date: string;
+  normal: number;
+  anxiety: number;
+  depression: number;
+  wellnessScore?: number;
+  entryCount: number;
+}
+
+export interface DashboardTrends {
+  range: DashboardRange;
+  series: DashboardTrendPoint[];
+  distribution: WellnessDistribution;
+  categoryTrends: Record<WellnessCategory, TrendDirection>;
+  wellnessScore: number;
+  wellnessChange: number;
+  anxietyChange: number;
+  slope: number;
+  positiveDays: number;
+  longestPositiveStreak: number;
 }
 
 // Forum Types
@@ -458,6 +519,23 @@ export const journalAPI = {
         summary: AnxietyTrendSummary;
       };
     }>(`/journal/anxiety-trend?days=${days}`);
+  },
+};
+
+// Dashboard API functions
+export const dashboardAPI = {
+  // Wellness summary (score, trend, streak)
+  getSummary: async () => {
+    return apiRequest<{ success: boolean; data: DashboardSummary }>(
+      '/dashboard/summary',
+    );
+  },
+
+  // Emotional distribution trends over a time range
+  getTrends: async (range: DashboardRange = 30) => {
+    return apiRequest<{ success: boolean; data: DashboardTrends }>(
+      `/dashboard/trends?range=${range}`,
+    );
   },
 };
 

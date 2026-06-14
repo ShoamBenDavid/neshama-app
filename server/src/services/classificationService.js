@@ -3,10 +3,9 @@ const { translateToEnglish, containsHebrew } = require('./translationService');
 
 async function classify(content) {
   try {
-    // The anxiety classifier was trained on English text only. If the journal
-    // entry contains Hebrew we must translate it to English first, otherwise
-    // the tokenizer maps every Hebrew word to <UNK> and the prediction is
-    // meaningless.
+    // The classifier was trained on English text. If the journal entry
+    // contains Hebrew we translate it first so the tokenizer sees the language
+    // it was trained on.
     let textForModel = content;
     if (containsHebrew(content)) {
       textForModel = await translateToEnglish(content);
@@ -23,10 +22,28 @@ async function classify(content) {
     }
 
     const result = await response.json();
+    const rawCategory = result.category || result.predicted_class;
+    const category = String(rawCategory || '').trim().toLowerCase();
+    const probabilities =
+      result.probabilities || result.probabilities_breakdown || {};
+    const normalizedProbabilities = {
+      normal: Number(probabilities.normal ?? probabilities.Normal ?? 0),
+      anxiety: Number(probabilities.anxiety ?? probabilities.Anxiety ?? 0),
+      depression: Number(probabilities.depression ?? probabilities.Depression ?? 0),
+    };
+    const confidence = Number(result.confidence ?? 0);
 
     return {
-      anxietyLevel: result.anxiety_level,
-      anxietyLabel: result.anxiety_label,
+      classification: {
+        category,
+        probabilities: normalizedProbabilities,
+        confidence,
+        modelVersion: 'neshama_v4_final',
+        classifiedAt: new Date(),
+      },
+      // Legacy field kept only for old charts that still read anxietyLevel.
+      anxietyLevel: normalizedProbabilities.anxiety,
+      anxietyLabel: null,
     };
   } catch (error) {
     console.error('Classification failed:', error.message);
