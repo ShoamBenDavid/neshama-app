@@ -32,8 +32,8 @@ type Tone = 'low' | 'moderate' | 'high' | 'neutral';
 const toneForLabel = (label: string | null): Tone => {
   if (!label) return 'neutral';
   const normalized = label.trim().toLowerCase();
-  if (normalized === 'depression' || normalized === 'high') return 'high';
-  if (normalized === 'anxiety' || normalized === 'moderate') return 'moderate';
+  if (normalized === 'depression' || normalized === 'moderate') return 'moderate';
+  if (normalized === 'anxiety' || normalized === 'high') return 'high';
   if (normalized === 'normal' || normalized === 'low') return 'low';
   return 'neutral';
 };
